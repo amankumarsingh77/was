@@ -23,6 +23,6 @@ async def search(q:Optional[str]=None):
         url = await WatchAsian().search(q)
         if url:
             return {"status":"200","url":url}
-        return {"msg":"hi"}
+    return {"msg":"hi"}
 if __name__ == "__main__":
     os.system("uvicorn main:app --host 127.0.0.1 --port 8004")
