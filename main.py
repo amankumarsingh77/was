@@ -1,6 +1,7 @@
 from typing import Optional
 from fastapi import FastAPI
 from watchAsian import WatchAsian
+import os
 app = FastAPI()
 
 
@@ -16,3 +17,5 @@ async def home(url:Optional[str]=None):
         title,season,episodes = await WatchAsian().get_title_season_episodes(url)
         return {"status":"200","sources":episodes}
     return {"msg":"hi"}
+if __name__ == "__main__":
+    os.system("uvicorn main:app --host 127.0.0.1 --port 8004")
