@@ -81,5 +81,9 @@ class WatchAsian:
         title,season,episode=self.get_title(soup)
         links = [link.get("data-video") if link.get("data-video").startswith("http") else f"https:{link.get('data-video')}" for link in soup.find("div",{"class":"anime_muti_link"}).find("ul").find_all("li")]
         return (title,season,episode,links)
+    async def search(self,title):
+        data = await self.request(f"https://watchasian.so/search?type=movies&keyword={title}",headers={"X-Requested-With":"XMLHttpRequest",},get="json")
+        if data:
+            return f"https://watchasian.so{data[0]['url']}"
 if __name__ == '__main__':
-    print(asyncio.run(WatchAsian().get_links("https://watchasian.so/boy-for-rent-episode-2.html")))
+    print(asyncio.run(WatchAsian().search("cute programmer")))
