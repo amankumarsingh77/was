@@ -59,11 +59,18 @@ class WatchAsian:
         episode = splitted[-1]
         episode = episode.split("Episode")[-1].strip()
         title = title.split("Episode")[0]
-        return (title.strip(),season.strip(),episode)
+        meta = soup.find("div",{"class":"info"})
+        year = 0
+        if meta:
+            for anchor in meta.find_all("a"):
+                if anchor.get("href").startswith("/released-in"):
+                    year = anchor.text
+                    break
+        return (title.strip(),year,season.strip(),episode)
     async def get_title_season_episodes(self,url):
         content = await self.request(url,get="text")
         soup = self.parse(content)
-        title,season_number,episode_number=self.get_title(soup)
+        title,year,season_number,episode_number=self.get_title(soup)
         episodes = []
         all_episodes = soup.find("ul",{"class":"all-episode"})
         if all_episodes:
@@ -74,16 +81,22 @@ class WatchAsian:
                     episodes.append(episode)
         if episodes:
             episodes.reverse()
-        return (title,season_number,episodes)
+        return (title,year,season_number,episodes)
     async def get_links(self,url):
         content = await self.request(url,get="text")
         soup = self.parse(content)
-        title,season,episode=self.get_title(soup)
+        title,year,season,episode=self.get_title(soup)
         links = [link.get("data-video") if link.get("data-video").startswith("http") else f"https:{link.get('data-video')}" for link in soup.find("div",{"class":"anime_muti_link"}).find("ul").find_all("li")]
-        return (title,season,episode,links)
-    async def search(self,title):
+        return (title,year,season,episode,links)
+    async def search(self,title,year=None):
         data = await self.request(f"https://watchasian.so/search?type=movies&keyword={title}",headers={"X-Requested-With":"XMLHttpRequest",},get="json")
         if data:
+            if year:
+                for result in data:
+                    release_date = result["status"].split(":")[-1].strip()
+                    if release_date.isnumeric() and year.isnumeric():
+                        if int(release_date)==int(year):
+                            return f"https://watchasian.so{result['url']}"
             return f"https://watchasian.so{data[0]['url']}"
 if __name__ == '__main__':
     print(asyncio.run(WatchAsian().search("cute programmer")))
