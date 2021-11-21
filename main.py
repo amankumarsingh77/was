@@ -25,4 +25,4 @@ async def search(q:Optional[str]=None,year:Optional[str]=None):
             return {"status":"200","url":url}
     return {"msg":"hi"}
 if __name__ == "__main__":
-    os.system("uvicorn main:app --host 127.0.0.1 --port 8004")
+    os.system("gunicorn -k uvicorn.workers.UvicornH11Worker main:app --bind 127.0.0.1:8004  --daemon")

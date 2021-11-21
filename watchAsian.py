@@ -50,6 +50,10 @@ class WatchAsian:
     def get_title(self,soup):
         h1 = soup.find("h1").text.strip()
         splitted = re.split("[\(\)]",h1)
+        year = 0
+        for i in splitted:
+            if len(i)==4 and i.isnumeric():
+                year = i
         title_season = splitted[0].strip().split("Season")
         if len(title_season)==2:
             title,season= title_season
@@ -60,7 +64,6 @@ class WatchAsian:
         episode = episode.split("Episode")[-1].strip()
         title = title.split("Episode")[0]
         meta = soup.find("div",{"class":"info"})
-        year = 0
         if meta:
             for anchor in meta.find_all("a"):
                 if anchor.get("href").startswith("/released-in"):

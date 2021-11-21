@@ -8,6 +8,7 @@ aiohttp = "*"
 bs4 = "*"
 random-user-agent = "*"
 fastapi = {extras = ["all"], version = "*"}
+gunicorn = "*"
 
 [dev-packages]
 
