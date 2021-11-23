@@ -77,11 +77,15 @@ class WatchAsian:
         episodes = []
         all_episodes = soup.find("ul",{"class":"all-episode"})
         if all_episodes:
-            for episode in all_episodes.find_all("h3",{"class":"title"}):
-                mo = re.search(r"/[\-\.\w\d]*",episode.get("onclick"))
-                if mo:
-                    episode = f"https://watchasian.so{mo.group()}"
-                    episodes.append(episode)
+            episodes_block = all_episodes.find_all("li")
+            for episode_block in episodes_block:
+                episode_type = episode_block.find("span",{"class":"type"}).get("class")[-1]
+                if episode_type.lower() == "sub":  
+                    episode = episode_block.find("h3",{"class":"title"})
+                    mo = re.search(r"/[\-\.\w\d]*",episode.get("onclick"))
+                    if mo:
+                        episode = f"https://watchasian.so{mo.group()}"
+                        episodes.append(episode)
         if episodes:
             episodes.reverse()
         return (title,year,season_number,episodes)
