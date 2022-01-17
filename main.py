@@ -7,13 +7,13 @@ app = FastAPI()
 
 @app.get("/")
 async def home(url:Optional[str]=None):
-    if url and "watchasian" in url:
-        title,year,season,episode,links = await WatchAsian().get_links(url)
-        return {"status":"200","title":title,"year":year,"season":season,"episode":episode,"sources":links}
+    if url and "dramacool" in url:
+        title,year,season,episode,watch_links,download_links = await WatchAsian().get_links(url)
+        return {"status":"200","title":title,"year":year,"season":season,"episode":episode,"sources":watch_links,"download_sources":download_links}
     return {"msg":"hi"}
 @app.get("/episodes/")
 async def episode(url:Optional[str]=None):
-    if url and "watchasian" in url:
+    if url and "dramacool" in url:
         title,year,season,episodes = await WatchAsian().get_title_season_episodes(url)
         return {"status":"200","title":title,"year":year,"season":season,"sources":episodes}
     return {"msg":"hi"}
