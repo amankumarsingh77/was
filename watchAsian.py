@@ -84,7 +84,7 @@ class WatchAsian:
                     episode = episode_block.find("h3",{"class":"title"})
                     mo = re.search(r"/[\-\.\w\d]*",episode.get("onclick"))
                     if mo:
-                        episode = f"https://dramacool.sk{mo.group()}"
+                        episode = f"https://www.dramacool1.io{mo.group()}"
                         episodes.append(episode)
         if episodes:
             episodes.reverse()
@@ -99,14 +99,14 @@ class WatchAsian:
         download_links = [link.get("href") for div in soup.find_all("div",{"class":"cf-download"}) for link in div.find_all("a")]
         return (title,year,season,episode,watch_links,download_links)
     async def search(self,title,year=None):
-        data = await self.request(f"https://dramacool.sk/search?type=movies&keyword={title}",headers={"X-Requested-With":"XMLHttpRequest",},get="json")
+        data = await self.request(f"https://www.dramacool1.io/search?type=series&keyword={title}",headers={"X-Requested-With":"XMLHttpRequest",},get="json")
         if data:
             if year:
                 for result in data:
                     release_date = result["status"].split(":")[-1].strip()
                     if release_date.isnumeric() and year.isnumeric():
                         if int(release_date)==int(year):
-                            return f"https://dramacool.sk{result['url']}"
-            return f"https://dramacool.sk{data[0]['url']}"
+                            return f"https://www.dramacool1.io{result['url']}"
+            return f"https://www.dramacool1.io{data[0]['url']}"
 if __name__ == '__main__':
     print(asyncio.run(WatchAsian().search("cute programmer")))
