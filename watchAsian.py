@@ -5,6 +5,7 @@ import json
 from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import SoftwareName, OperatingSystem
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 
 
 def get_ua():
@@ -110,8 +111,16 @@ class WatchAsian:
         }, get="text")
         soup = self.parse(content)
         title, year, season, episode = self.get_title(soup)
-        watch_links = [link.get("data-video") if link.get("data-video").startswith(
-            "http") else f"https:{link.get('data-video')}" for link in soup.find("div", {"class": "anime_muti_link"}).find("ul").find_all("li")]
+        watch_links = []
+        for li in soup.find("div", {"class": "anime_muti_link"}).find("ul").find_all("li"):
+            watch_link = li.get("data-video") if li.get("data-video").startswith("http") else f"https:{li.get('data-video')}"
+            parsed_link = urlparse(watch_link)
+            data_provider = li.get("data-provider","kvid").lower()
+            if  data_provider == "streamsb":
+                watch_link = f"{parsed_link.scheme}://streamsb.net{parsed_link.path}"
+            elif data_provider == "xstreamcdn":
+                watch_link = f"{parsed_link.scheme}://fembed.com{parsed_link.path}"
+            watch_links.append(watch_link)
         download_links = [link.get("href") for div in soup.find_all(
             "div", {"class": "cf-download"}) for link in div.find_all("a")]
         return (title, year, season, episode, watch_links, download_links)
