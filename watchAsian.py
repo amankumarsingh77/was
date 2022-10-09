@@ -117,7 +117,7 @@ class WatchAsian:
             parsed_link = urlparse(watch_link)
             data_provider = li.get("data-provider","kvid").lower()
             if  data_provider == "streamsb":
-                watch_link = f"{parsed_link.scheme}://streamsb.net{parsed_link.path}"
+                watch_link = f"{parsed_link.scheme}://streamsb.com{parsed_link.path}"
             elif data_provider == "xstreamcdn":
                 watch_link = f"{parsed_link.scheme}://fembed.com{parsed_link.path}"
             watch_links.append(watch_link)
