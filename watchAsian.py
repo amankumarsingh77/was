@@ -138,7 +138,7 @@ class WatchAsian:
                     release_date = result["status"].split(":")[-1].strip()
                     if release_date.isnumeric() and year.isnumeric():
                         if int(release_date) == int(year):
-                            return "{host}{path}".format(host=self._HOST,path={result['url']})
+                            return "{host}{path}".format(host=self._HOST,path=result['url'])
             return "{host}{path}".format(host=self._HOST,path=data[0]['url'])
             
 if __name__ == '__main__':
