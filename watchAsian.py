@@ -23,6 +23,7 @@ def get_ua():
 
 
 class WatchAsian:
+    _HOST = "https://www.dramacool1.io"
     async def request(self, url, headers: dict = {}, data: dict = {}, get="text", method="get"):
         headers["User-Agent"] = get_ua()
         headers["Accept"] = "text/html" if get == "text" else "application/json"
@@ -99,12 +100,18 @@ class WatchAsian:
                     episode = episode_block.find("h3", {"class": "title"})
                     mo = re.search(r"/[\-\.\w\d]*", episode.get("onclick"))
                     if mo:
-                        episode = f"https://www.dramacool1.io{mo.group()}"
+                        episode = "{host}{path}".format(host=self._HOST,path=mo.group())
                         episodes.append(episode)
-        if episodes:
-            episodes.reverse()
+        episodes.reverse()
         return (title, year, season_number, episodes)
-
+    def _replace_host(self,data_provider,link):
+        if (data_provider == "streamsb") or (data_provider == "xstreamcdn"):
+                parsed_link = urlparse(link)
+                if data_provider == "streamsb":
+                    link = f"{parsed_link.scheme}://streamsb.com{parsed_link.path}"
+                elif data_provider == "xstreamcdn":
+                    link = f"{parsed_link.scheme}://fembed.com{parsed_link.path}"
+        return link
     async def get_links(self, url):
         content = await self.request(url, headers={
             "Cookie": "dramacools=2a387tjjtruegril8m2a2paq84; auth=yPVfno%2Bjob2kzKTFvqpgl5DbjxGXVcWrdEnGZoFjfikKe6PVmHBU4%2BjvKvbxjL8Si6OMtTse5We14CXwhZA9ZQ%3D%3D",
@@ -113,29 +120,26 @@ class WatchAsian:
         title, year, season, episode = self.get_title(soup)
         watch_links = []
         for li in soup.find("div", {"class": "anime_muti_link"}).find("ul").find_all("li"):
-            watch_link = li.get("data-video") if li.get("data-video").startswith("http") else f"https:{li.get('data-video')}"
-            parsed_link = urlparse(watch_link)
-            data_provider = li.get("data-provider","kvid").lower()
-            if  data_provider == "streamsb":
-                watch_link = f"{parsed_link.scheme}://streamsb.com{parsed_link.path}"
-            elif data_provider == "xstreamcdn":
-                watch_link = f"{parsed_link.scheme}://fembed.com{parsed_link.path}"
+            data_video = li.get("data-video")
+            data_provider = li.get("data-provider", "kvid").lower()
+            watch_link = data_video if data_video.startswith("http") else "https:"+data_video
+            watch_link = self._replace_host(data_provider,watch_link)
             watch_links.append(watch_link)
-        download_links = [link.get("href") for div in soup.find_all(
-            "div", {"class": "cf-download"}) for link in div.find_all("a")]
+        download_links = [
+            link.get("href") for div in soup.find_all("div", {"class": "cf-download"}) for link in div.find_all("a")
+        ]
         return (title, year, season, episode, watch_links, download_links)
 
-    async def search(self, title, year=None):
-        data = await self.request(f"https://www.dramacool1.io/search?type=series&keyword={title}", headers={"X-Requested-With": "XMLHttpRequest", }, get="json")
+    async def search(self, keyword, year=None):
+        data = await self.request("{host}/search?type=series&keyword={keyword}".format(host=self._HOST,keyword=keyword), headers={"X-Requested-With": "XMLHttpRequest", }, get="json")
         if data:
             if year:
                 for result in data:
                     release_date = result["status"].split(":")[-1].strip()
                     if release_date.isnumeric() and year.isnumeric():
                         if int(release_date) == int(year):
-                            return f"https://www.dramacool1.io{result['url']}"
-            return f"https://www.dramacool1.io{data[0]['url']}"
-
-
+                            return "{host}{path}".format(host=self._HOST,path={result['url']})
+            return "{host}{path}".format(host=self._HOST,path=data[0]['url'])
+            
 if __name__ == '__main__':
     print(asyncio.run(WatchAsian().search("cute programmer")))
