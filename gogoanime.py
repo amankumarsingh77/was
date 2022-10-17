@@ -35,9 +35,11 @@ class GogoAnime(WatchAsian):
             url = f"https://{urlparse(url).netloc}{anime_info.find('a').get('href')}"
             content = await self.request(url, get="text")
             soup = self.parse(content)
-            year = soup.find("div", {
-                "class": "anime_info_body_bg"
-            }).find_all("p")[-3].text.split(": ")[-1]
+        year = soup.find("div",
+                         {
+                             "class": "anime_info_body_bg"
+                         }
+                         ).find_all("p")[-3].text.split(": ")[-1]
         movie_id = soup.find("input", {"id": "movie_id"}).get("value")
         episode_content = await self.request(f"https://ajax.gogo-load.com/ajax/load-list-episode?ep_start=0&ep_end=99999&id={movie_id}")
         episode_soup = self.parse(episode_content)
