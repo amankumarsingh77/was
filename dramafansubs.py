@@ -65,7 +65,11 @@ class DFS:
             if serie:
                 data = await self.request(serie, get="json")
                 season = filter(lambda a: int(a["title"].lower().split()[-1].strip()) == int(season),data).__next__()
-                episode = filter(lambda a: int(a["title"].lower().split()[-1].strip()) == int(episode), season["episodes"]).__next__()
+                episodes = season["episodes"]
+                if len(episodes) == episode:
+                    episode = episodes[-1]
+                else:
+                    episode = filter(lambda a: int(a["title"].lower().split()[-1].strip()) == int(episode), episodes).__next__()
                 for source in episode["sources"]:
                     if source["type"].lower() == "mp4":
                         watch_links.append(source["url"])
