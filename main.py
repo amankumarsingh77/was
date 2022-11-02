@@ -69,7 +69,7 @@ async def search(q: Optional[str] = None, year: Optional[str] = None, anime: Opt
     return {"msg": "hi"}
 
 
-@app.get("/dramafansubs/")
+@app.get("/dramafansubs/{keyword}/{season}/{episode}/")
 async def get_dramafansubs_sources(keyword: str, season: int, episode: int, year: Optional[str] = None,):
     sources = await DFS().get_sources(keyword=keyword, year=year, season=season, episode=episode)
     return {"status": "200", "sources": sources}
