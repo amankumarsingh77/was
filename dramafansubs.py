@@ -25,7 +25,9 @@ def get_ua():
 
 
 class DFS:
-    _HOST = "https://dramafansubs.net"
+    _HOST = "https://apk.dfbplay.com/api"
+    _SEARCH = _HOST + "/search/{keyword}/4F5A9C3D9A86FA54EACEDDD635185/977c71e0-c95e-4396-a93f-123cb08bdbce/"
+    _SERIE = _HOST + "/season/by/serie/{id}/4F5A9C3D9A86FA54EACEDDD635185/977c71e0-c95e-4396-a93f-123cb08bdbce/"
     _PROXY = "http://smykbabu-rotate:kiy81fvox1h3@p.webshare.io:80"
     async def request(self, url, headers: dict = {}, data: dict = {}, get="text", method="get"):
         headers["User-Agent"] = get_ua()
@@ -44,62 +46,33 @@ class DFS:
                             finally:
                                 return data
     async def search(self, keyword, year=None):
-        resp = await self.request("{host}/wp-json/dooplay/search/?keyword={keyword}&nonce=0a06ecafad".format(host=self._HOST, keyword=keyword), get='json')
-        if not resp.get("error"):
-            dramas = list(resp.values())
-            dramas.sort(key=lambda a: int(a["extra"]["date"]), reverse=True)
-            if not year:
-                return dramas[0]["url"]
+        resp = await self.request(self._SEARCH.format(keyword=keyword), get='json')
+        dramas = resp["posters"]
+        if not dramas:
+            return 
+        if year:
             try:
-                return filter(lambda a: int(a['extra']['date']) == int(year), dramas).__next__()["url"]
+                return self._SERIE.format(id=filter(lambda a:a["year"] == int(year),dramas).__next__()["id"])
             except StopIteration:
-                return
+                pass
+        dramas.sort(key=lambda a:a["year"],reverse=True)
+        return self._SERIE.format(id=dramas[0]["id"])
 
-    def parse(self, content):
-        soup = BeautifulSoup(content, "html.parser")
-        return soup
-
-    def get_title(self, soup):
-        try:
-            title, season_episode = soup.find(
-                "h1", {"class": "epih1"}
-            ).text.split(":")
-            season, episode = season_episode.strip().split("x")
-            year = soup.find("span", {"class": "date"}).text.split(", ")[-1]
-        except AttributeError:
-            data = soup.find("div", {"class": "data"})
-            title = data.find("h1").text
-            year = data.find("span", {"class": "date"}).text.split(", ")[-1]
-            episode = None
-            season = 1
-        return (title, year, season, episode)
-
-    async def get_title_season_episodes(self, url):
-        content = await self.request(url, get="text")
-        soup = self.parse(content)
-        (title, year, season, episode) = self.get_title(soup)
-        episodes = []
-        for episode in soup.find("ul", {"class": "episodios"}).find_all("li"):
-            episodes.append(episode.find("a").get("href"))
-        return (title, year, season, episodes)
-
-    async def get_links(self, url):
-        content = await self.request(url, get="text")
-        soup = self.parse(content)
-        (title, year, season, episode) = self.get_title(soup)
+    async def get_sources(self,*, keyword, season, episode, year = None,):
         watch_links = []
-        download_links = []
-        for link in soup.find_all("iframe", {"class": "metaframe rptss"}):
-            link = unquote(link.get("src"))
-            parsedURL = urlparse(link)
-            if parsedURL.netloc == urlparse(self._HOST).netloc:
-                link = parse_qs(parsedURL.query)["source"][0]
-                download_links.append(link)
-            watch_links.append(link)
-        return (title, year, season, episode, watch_links, download_links)
-
+        try:
+            serie = await self.search(keyword, year )
+            if serie:
+                data = await self.request(serie, get="json")
+                season = filter(lambda a: int(a["title"].lower().split()[-1].strip()) == int(season),data).__next__()
+                episode = filter(lambda a: int(a["title"].lower().split()[-1].strip()) == int(episode), season["episodes"]).__next__()
+                for source in episode["sources"]:
+                    if source["type"].lower() == "mp4":
+                        watch_links.append(source["url"])
+        except StopIteration or KeyError:
+            pass
+        return watch_links
 
 if __name__ == '__main__':
     df = DFS()
-    print(asyncio.run(df.get_links(
-        "https://dramafansubs.net/episodio/curtain-call-episodio-1/")))
+    print(asyncio.run(df.get_sources(keyword="love in contract",season=1,episode=1)))

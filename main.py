@@ -16,30 +16,20 @@ async def get_dramacool(url):
     return await WatchAsian().get_links(url)
 
 
-async def get_dramafansubs(url):
-    return await DFS().get_links(url)
-
-
 async def get_gogoanime_episodes(url):
     return await GogoAnime().get_title_season_episodes(url)
-
-
-async def get_dramafansubs_episodes(url):
-    return await DFS().get_title_season_episodes(url)
 
 
 async def get_dramacool_episodes(url):
     return await WatchAsian().get_title_season_episodes(url)
 
-_SUPPORTED = ['dramacool', "gogoanime", "dramafansubs", ]
+_SUPPORTED = ['dramacool', "gogoanime", ]
 
 _FUNCTIONS = {
     "dramacool_links": get_dramacool,
     "gogoanime_links": get_gogoanime,
-    "dramafansubs_links": get_dramafansubs,
     "dramacool_episodes": get_dramacool_episodes,
     "gogoanime_episodes": get_gogoanime_episodes,
-    "dramafansubs_episodes": get_dramafansubs_episodes,
 }
 
 
@@ -68,17 +58,21 @@ async def episode(url: Optional[str] = None):
 
 
 @app.get("/search/")
-async def search(q: Optional[str] = None, year: Optional[str] = None, anime: Optional[bool] = False, dramafansubs: Optional[bool] = False):
+async def search(q: Optional[str] = None, year: Optional[str] = None, anime: Optional[bool] = False):
     if q:
         if anime:
             url = await GogoAnime().search(q, year)
-        elif dramafansubs:
-            url = await DFS().search(q, year)
         else:
             url = await WatchAsian().search(q, year)
         if url:
             return {"status": "200", "url": url}
     return {"msg": "hi"}
+
+
+@app.get("/dramafansubs/")
+async def get_dramafansubs_sources(keyword: str, season: int, episode: int, year: Optional[str] = None,):
+    sources = await DFS().get_sources(keyword=keyword, year=year, season=season, episode=episode)
+    return {"status": "200", "sources": sources}
 if __name__ == "__main__":
     os.system(
         "gunicorn -k uvicorn.workers.UvicornH11Worker main:app --bind 127.0.0.1:8004  --daemon")
