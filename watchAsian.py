@@ -23,7 +23,7 @@ def get_ua():
 
 
 class WatchAsian:
-    _HOST = "https://www.dramacool1.io"
+    _HOST = "https://runasian.net"
     async def request(self, url, headers: dict = {}, data: dict = {}, get="text", method="get"):
         headers["User-Agent"] = get_ua()
         headers["Accept"] = "text/html" if get == "text" else "application/json"

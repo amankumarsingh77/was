@@ -23,12 +23,12 @@ async def get_gogoanime_episodes(url):
 async def get_dramacool_episodes(url):
     return await WatchAsian().get_title_season_episodes(url)
 
-_SUPPORTED = ['dramacool', "gogoanime", ]
+_SUPPORTED = ['runasian', "gogoanime"]
 
 _FUNCTIONS = {
-    "dramacool_links": get_dramacool,
+    "runasian_links": get_dramacool,
     "gogoanime_links": get_gogoanime,
-    "dramacool_episodes": get_dramacool_episodes,
+    "runasian_episodes": get_dramacool_episodes,
     "gogoanime_episodes": get_gogoanime_episodes,
 }
 
