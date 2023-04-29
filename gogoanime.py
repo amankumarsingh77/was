@@ -5,11 +5,11 @@ import re
 
 
 class GogoAnime(WatchAsian):
-    _HOST = "https://gogoanime.dk"
+    _HOST = "https://gogoanime.cl"
 
     async def get_links(self, url):
         content = await self.request(url, headers={
-            "Cookie": "gogoanime=kn7bup7jkmt7jlfffnuq8bfvj3;auth=hCilSYMNLvUJj6SPo5+xZwtZt9xKx/Uaj7XQwFF7Bzs+m032r7J8w/4/r+JWetw+V04hlBHQvddrmVfynSeNRg=="
+            "Cookie": "gogoanime=2alh847a1luvi0v4dang397uq3;auth=j307tFbn1PHY6qpe2qLhYBqSIa2Y3hnDb4EBIrw/1NpM0TXAoYuoYKZHCfhpZ7TcmaCEMDfdxBb1gp+YOPmbQw=="
         })
         soup = self.parse(content)
         title, year, season, episode = self.get_title(soup)
