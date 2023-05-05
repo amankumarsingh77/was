@@ -114,7 +114,7 @@ class WatchAsian:
         return link
     async def get_links(self, url):
         content = await self.request(url, headers={
-            "Cookie": "dramacools=2a387tjjtruegril8m2a2paq84; auth=yPVfno%2Bjob2kzKTFvqpgl5DbjxGXVcWrdEnGZoFjfikKe6PVmHBU4%2BjvKvbxjL8Si6OMtTse5We14CXwhZA9ZQ%3D%3D",
+            "Cookie": "dramacool=a2cqatfnhr6bup9e6svmpsgdk0; auth=dSYXfD7sCR3fBqe38oLexbIgg8oOfPurdtDCmezvivg43%2BWBHyv7dJPqTyf3WdkRs6FjPy4MfQubqBEPW3f3HQ%3D%3D",
         }, get="text")
         soup = self.parse(content)
         title, year, season, episode = self.get_title(soup)
