@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from watchAsian import WatchAsian
 from dramafansubs import DFS
 from gogoanime import GogoAnime
+import uvicorn
+
 import os
 from urllib.parse import urlparse
 app = FastAPI()
@@ -76,4 +78,4 @@ async def get_dramafansubs_sources(keyword: str, season: int, episode: int, year
 
 
 if __name__ == "__main__":
-    os.system("gunicorn -k uvicorn.workers.UvicornH11Worker main:app --bind 127.0.0.1:8004  --daemon")
+    uvicorn.run(app, host="164.68.123.133", port=8000)

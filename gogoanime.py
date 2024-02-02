@@ -5,7 +5,7 @@ import re
 
 
 class GogoAnime(WatchAsian):
-    _HOST = "https://gogoanime.cl"
+    _HOST = "https://gogoanimehd.io"
 
     async def get_links(self, url):
         content = await self.request(url,headers={"Cookie":"gogoanime=2alh847a1luvi0v4dang397uq3; auth=j307tFbn1PHY6qpe2qLhYBqSIa2Y3hnDb4EBIrw%2F1NpM0TXAoYuoYKZHCfhpZ7TcmaCEMDfdxBb1gp%2BYOPmbQw%3D%3D"},get="text")
@@ -68,5 +68,7 @@ class GogoAnime(WatchAsian):
 
 if __name__ == "__main__":
     gogo = GogoAnime()
-    print(asyncio.run(gogo.get_title_season_episodes(
-        "https://gogoanime.dk/millenniums-of-warring-states-episode-14")))
+    # print(asyncio.run(gogo.get_title_season_episodes(
+    #     "https://gogoanimehd.io/millenniums-of-warring-states-episode-14")))
+    
+    print(asyncio.run(gogo.get_links('https://gogoanimehd.io/bleach-sennen-kessen-hen-ketsubetsu-tan-episode-10')))
