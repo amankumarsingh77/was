@@ -78,4 +78,4 @@ async def get_dramafansubs_sources(keyword: str, season: int, episode: int, year
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="164.68.123.133", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
